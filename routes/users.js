@@ -71,7 +71,6 @@ router.get('/list', (req, res) => {
     })
 })
 function insertRecord(req, res) {
-    res.send("Sign up processing!");
     const atnIdDefault = "GCC-19118-XMCVH-98764-TYUPK-7U8IGH";
     var user = new Users();
     user.name = req.body.name;
