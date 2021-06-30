@@ -1,4 +1,5 @@
 const multer = require('multer');
+const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const expresshdb = require('express-handlebars');
@@ -41,7 +42,7 @@ router.get('/', (req, res) => {
     if (!isAdmin(req, res)) res.redirect('/users/signin');
     if (req.query.qr) {
         let nameq = req.query.qr;
-        Product.find({ name: nameq }, (err, docs) => {
+        Product.find({ name: new RegExp(nameq) }, (err, docs) => {
             if (!err) {
                 res.render('manage', {
                     bootstrapCSS: "/stylesheets/bootstrap.css",
@@ -124,6 +125,10 @@ function insertRecord(req, res) {
         if (!err) {
             res.redirect("/manage");
         } else {
+
+            if (req.file && product.picture.path) fs.unlink(product.picture.path.toString(), (err) => {
+                if (err) console.log(err);
+            })
             res.render('addOrEditproduct', {
                 viewTitle: 'Add Product',
                 loginCSS: "/stylesheets/loginform.css",
@@ -134,10 +139,14 @@ function insertRecord(req, res) {
         }
     });
 }
-function updateRecord(req, res) {
+async function updateRecord(req, res) {
+    oldpic = await Product.findOne({ _id: req.body._id });
     if (!isAdmin(req, res)) res.redirect('/users/signin'); //req.body, { new: true }
     Product.findByIdAndUpdate({ _id: req.body._id }, { name: req.body.name, price: req.body.price, stock: req.body.stock, picture: req.file }, (err, doc) => {
         if (!err) {
+            fs.unlink(oldpic.picture.path.toString(), (err) => {
+                if (err) console.log(err);
+            })
             res.redirect('/manage');
         } else {
             res.render('addOrEditproduct', {
