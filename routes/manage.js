@@ -44,9 +44,12 @@ router.get('/', (req, res) => {
         let nameq = req.query.qr;
         Product.find({ name: new RegExp(nameq) }, (err, docs) => {
             if (!err) {
+                if (docs.length==0) result = "No Result to Show! search blank to show all product";
+                else result = "Your search keyword: \""+nameq+"\"";
                 res.render('manage', {
                     bootstrapCSS: "/stylesheets/bootstrap.css",
                     mainCSS: "/stylesheets/main.css",
+                    result: result,
                     bootstrap3: "https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css",
                     awesome: "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
                     list: docs
