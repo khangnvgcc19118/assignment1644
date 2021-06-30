@@ -3,11 +3,12 @@
     "",
     "\\models",
     "\\public",
+    "\\public\\img",
     "\\public\\js",
     "\\public\\stylesheets",
     "\\routes",
     "\\views"
   ],
-  "SelectedNode": "\\routes\\manage.js",
+  "SelectedNode": "\\public\\img\\logo.png",
   "PreviewInSolutionExplorer": false
 }

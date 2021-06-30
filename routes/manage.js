@@ -135,8 +135,8 @@ function insertRecord(req, res) {
     });
 }
 function updateRecord(req, res) {
-    if (!isAdmin(req, res)) res.redirect('/users/signin');
-    Product.findByIdAndUpdate({ _id: req.body._id }, req.body, { new: true }, (err, doc) => {
+    if (!isAdmin(req, res)) res.redirect('/users/signin'); //req.body, { new: true }
+    Product.findByIdAndUpdate({ _id: req.body._id }, { name: req.body.name, price: req.body.price, stock: req.body.stock, picture: req.file }, (err, doc) => {
         if (!err) {
             res.redirect('/manage');
         } else {
