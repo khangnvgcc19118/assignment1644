@@ -1,0 +1,58 @@
+<div class="container" style="display: block; width: 100%; padding-top: 25px; position: unset; background-color: unset;">
+    <div style="position: relative; display: block;">
+        <nav class="navbar navbar-light" style="display: compact;">
+            <div class="">
+                <div class="logo navbar">
+                    <a href="#"> <img src="img/logo.png" title="#" style="height: 150px;"></a>
+                    <h3>ATN - Manage product</h3>
+                    <h5 style="display: block">&nbsp;(Administrator page)</h5>
+                    <ul class="list-nav">
+                        <li class="items-nav" title="Add new product ro ATN system"><a href="/manage/add" class="links-nav" style="font-size: 15px">Add product</a></li>
+                        <li class="items-nav" title="Sign out"><a href="/signout" class="links-nav" style="font-size: 15px">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div style="position: relative; display: block; background-color: unset;">
+        <form method="get" action="/manage" style="position: relative;">
+            <h6 style="display: contents;">Search: </h6>
+            <input class="form__input" type="text" placeholder="Keyword" name="qr" id="qr">
+            <button class="form__button button submit" type="submit" style="width: 100px; height: 35px;">Search</button>
+        </form>
+    </div>
+    <div style="display: block; padding: 10px 20px; position: relative;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product name</th>
+                    <th class="text-right">Price</th>
+                    <th class="text-right">Stock</th>
+                    <th class="text-center">picture</th>
+                    <th class="text-center">Edit/Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each list}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td class="text-right">{{this.price}}</td>
+                    <td class="text-right">{{this.stock}}</td>
+                    <td class="text-center">
+                        <img src="/img/{{this.picture.filename}}" alt="{{this.name}}" style="width: 150px; height: auto;" />
+                    </td>
+                    <td class="text-center">
+                        <a href="manage/update/{{this._id}}">
+                            <i class="fa fa-pencil fa-lg fs-2" aria-hidden="false"></i>
+                        </a>
+                        <a href="manage/delete/{{this._id}}" onclick="return confirm('Are you sure to delete this record?');">
+                            <i class="fa fa-trash fa-lg fs-2" aria-hidden="true">
+                            </i>
+                        </a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<form id="login" style=" height: 400px;" method="post" action="/users">
+    <h1>Sign Up</h1>
+    <fieldset id="inputs">
+        <input id="name" type="text" placeholder="Your full name" name="name" autofocus required>
+        <input id="username" type="email" placeholder="Email" name="email" required>
+        <input id="password" type="password" placeholder="Password" name="pass" required>
+        <input id="repassword" type="password" placeholder="Re-Password" name="repass" required>
+        <input id="ATN-employid" type="password" placeholder="ATN - EmployeeID" name="atnID" required>
+    </fieldset>
+    <fieldset id="actions">
+        <input type="submit" id="submit" value="Sign up">
+        <a href="/users/signin">You have been an account? Sign in now!</a>
+        <script>{{notification}}</script>
+    </fieldset>
+</form>

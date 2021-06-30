@@ -1,0 +1,12 @@
+<form id="login" method="post" action="/users" style="{{changeheight}}">
+    <h1>Log In</h1>
+    <fieldset id="inputs">
+        <h4 style="color: red;">{{notification}}</h4>
+        <input id="username" type="email" placeholder="Email" name="email" autofocus required>
+        <input id="password" type="password" placeholder="Password" name="pass" required>
+    </fieldset>
+    <fieldset id="actions">
+        <input type="submit" id="submit" value="Log in">
+        <a href="/users/forgotpass" onclick="alert('Please contact with IT department to reset your password!')">Forgot your password?</a><a href="/users/signup">Register</a>
+    </fieldset>
+</form>

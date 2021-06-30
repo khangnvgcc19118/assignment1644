@@ -1,0 +1,22 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Pass</th>
+            <th>ID</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each listproduct}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.pass}}</td>
+            <td>{{this.id}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
