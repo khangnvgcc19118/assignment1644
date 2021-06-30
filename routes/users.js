@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 const app = express();
 const Users = mongoose.model('users');
+const Key = mongoose.model('key');
 const crypto = require('crypto');
 
 
@@ -25,6 +26,7 @@ router.get('/forgotpass', (req, res) => {
 router.get('/signup', (req, res) => {
     res.render('signup', {
         loginCSS: "/stylesheets/loginform.css",
+        changeHeight: "height: 400px;",
     });
 })
 router.post("/", (req, res) => {
@@ -71,36 +73,63 @@ router.get('/list', (req, res) => {
     })
 })
 function insertRecord(req, res) {
-    res.send("Sign up processing!");
-    const atnIdDefault = "GCC-19118-XMCVH-98764-TYUPK-7U8IGH";
+    //const atnIdDefault = "GCC-19118-XMCVH-98764-TYUPK-7U8IGH";
     var user = new Users();
     user.name = req.body.name;
     user.id = req.body.atnID;
-    if (user.id != atnIdDefault) {
-        res.redirect('/users/signup');
-        return;
-    }
-    user.email = req.body.email;
-    user.pass = req.body.pass;
-    var repass = req.body.repass;
-    if (user.pass == repass) {
-        user.pass = crypto.createHash('md5').update(repass).digest('hex');
-        repass = user.pass;
-    }
-    user.save((err, doc) => {
-        if (!err) {
-            res.redirect('/users/signin');
+    Key.findOne({ key: user.id }, function (err, result) {
+        if (err) {
+            console.log(err);
+            res.render('signup', {
+                loginCSS: "/stylesheets/loginform.css",
+                user: req.body,
+                notification: "Contact with IT department to get your ATN-ID!",
+                changeHeight: "height: 450px;",
+            });
             return;
-        }
-        else {
-            if (err.name == "ValidationError") {
-                handleValidationError(err, req.body);
-                res.redirect("/users/signup");
+        } else if (result) {
+            user.email = req.body.email;
+            user.pass = req.body.pass;
+            var repass = req.body.repass;
+            if (user.pass == repass) {
+                user.pass = crypto.createHash('md5').update(repass).digest('hex');
+                repass = user.pass;
             }
-            console.log("Error occured during record insertion" + err);
+            else {
+                res.render('signup', {
+                    loginCSS: "/stylesheets/loginform.css",
+                    user: req.body,
+                    notification: "Password and repassword are not the same!",
+                    changeHeight: "height: 450px;",
+                });
+                return;
+            }
+            user.save((err, doc) => {
+                if (!err) {
+                    res.redirect('/users/signin');
+                    return;
+                }
+                else {
+                    if (err.name == "ValidationError") {
+                        handleValidationError(err, req.body);
+                        res.redirect("/users/signup");
+                    }
+                    console.log("Error occured during record insertion" + err);
+                    return;
+                }
+            })
+            return;
+        } else {
+            res.render('signup', {
+                loginCSS: "/stylesheets/loginform.css",
+                user: req.body,
+                notification: "Contact with IT department to get your ATN-ID!",
+                changeHeight: "height: 450px;",
+            });
             return;
         }
-    })
+    });
+
 }
 function handleValidationError(err, body) {
     for (field in err.errors) {

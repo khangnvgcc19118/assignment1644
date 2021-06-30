@@ -1,8 +1,9 @@
-<form id="login" style=" height: 400px;" method="post" action="/users">
+<form id="login" style="{{changeHeight}}" method="post" action="/users">
     <h1>Sign Up</h1>
     <fieldset id="inputs">
-        <input id="name" type="text" placeholder="Your full name" name="name" autofocus required>
-        <input id="username" type="email" placeholder="Email" name="email" required>
+        <h4 style="color: red;">{{notification}}</h4>
+        <input id="name" type="text" placeholder="Your full name" name="name" value="{{user.name}}" autofocus required>
+        <input id="username" type="email" placeholder="Email" name="email" value="{{user.email}}" required>
         <input id="password" type="password" placeholder="Password" name="pass" required>
         <input id="repassword" type="password" placeholder="Re-Password" name="repass" required>
         <input id="ATN-employid" type="password" placeholder="ATN - EmployeeID" name="atnID" required>

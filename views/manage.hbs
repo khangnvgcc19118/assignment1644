@@ -36,7 +36,7 @@
                 {{#each list}}
                 <tr>
                     <td>{{this.name}}</td>
-                    <td class="text-right">{{this.price}}</td>
+                    <td class="text-right">${{this.price}}</td>
                     <td class="text-right">{{this.stock}}</td>
                     <td class="text-center">
                         <img src="/img/{{this.picture.filename}}" alt="{{this.name}}" style="width: 150px; height: auto;" />
@@ -45,7 +45,7 @@
                         <a href="manage/update/{{this._id}}">
                             <i class="fa fa-pencil fa-lg fs-2" aria-hidden="false"></i>
                         </a>
-                        <a href="manage/delete/{{this._id}}" onclick="return confirm('Are you sure to delete this record?');">
+                        <a href="manage/delete/{{this._id}}" onclick="return confirm('Are you sure to delete this product?');">
                             <i class="fa fa-trash fa-lg fs-2" aria-hidden="true">
                             </i>
                         </a>

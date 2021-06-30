@@ -26,6 +26,7 @@ app.engine('hbs', expresshdb({
         allowProtoMethodsByDefault: true,
     },
 }))
+app.set('view engine', 'hbs');
 /// Cookies
 app.get('/cookie', function (req, res) {
     res.cookie('username', 'freetuts.net', { expires: new Date(Date.now() + 900000) });
@@ -46,7 +47,7 @@ app.get('/signout', (req, res) => {
 });
 ///
 
-app.set('view engine', 'hbs');
+
 
 app.get('/', (req, res) => {
     if (req.cookies['auth']) res.redirect('/manage');
