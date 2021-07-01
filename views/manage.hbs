@@ -42,7 +42,8 @@
                     <td class="text-right">${{this.price}}</td>
                     <td class="text-right">{{this.stock}}</td>
                     <td class="text-center">
-                        <img src="/img/{{this.picture.filename}}" alt="{{this.name}}" style="width: 150px; height: auto;" />
+                       <!-- <img src="/img/{{this.picture.filename}}" alt="{{this.name}}" style="width: 150px; height: auto;" />-->
+                        <img src="data:{{this.picture.cType}};base64,{{this.picture.pic}}" alt="" style="width: 150px; height:auto;"/>
                     </td>
                     <td class="text-center">
                         <a href="manage/update/{{this._id}}">

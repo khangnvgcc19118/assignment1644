@@ -5,7 +5,6 @@ var productSchema = new mongoose.Schema({
     name: {
         type: String,
         required: 'This field is required'
-
     },
     price: {
         type: String,
@@ -18,9 +17,8 @@ var productSchema = new mongoose.Schema({
 
     },
     picture: {
-        type: Object,
-        required: 'This field is required'
-
+        cType: String,
+        pic: Buffer
     }
 })
 

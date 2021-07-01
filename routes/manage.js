@@ -6,6 +6,7 @@ const expresshdb = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const { Console } = require('console');
 const router = express.Router();
 const app = express();
 const Product = mongoose.model('products');
@@ -45,7 +46,10 @@ router.get('/', (req, res) => {
         Product.find({ name: new RegExp(nameq) }, (err, docs) => {
             if (!err) {
                 if (docs.length==0) result = "No Result to Show! search blank to show all product";
-                else result = "Your search keyword: \""+nameq+"\"";
+                else result = "Your search keyword: \"" + nameq + "\"";
+                docs.forEach(element => {
+                    element.picture.pic = element.picture.pic.toString('base64');
+                });
                 res.render('manage', {
                     bootstrapCSS: "/stylesheets/bootstrap.css",
                     mainCSS: "/stylesheets/main.css",
@@ -59,6 +63,9 @@ router.get('/', (req, res) => {
     } else {
         Product.find((err, docs) => {
             if (!err) {
+                docs.forEach(element => {
+                    element.picture.pic = element.picture.pic.toString('base64');
+                });
                 res.render('manage', {
                     bootstrapCSS: "/stylesheets/bootstrap.css",
                     mainCSS: "/stylesheets/main.css",
@@ -96,10 +103,18 @@ router.get("/delete/:id", (req, res) => {
 });
 
 
+//router.post("/", uploadFile.single('image'), (req, res) => {
+//    if (!isAdmin(req, res)) res.redirect('/users/signin');
+//    if (req.body._id == "") {
+//        console.log(req.file);
+//        insertRecord(req, res);
+//    } else {
+//        updateRecord(req, res);
+//    }
+//});
 router.post("/", uploadFile.single('image'), (req, res) => {
     if (!isAdmin(req, res)) res.redirect('/users/signin');
-    if (req.body._id == "") {
-        console.log(req.file);
+    if (!req.body._id || req.body._id=="" ) {
         insertRecord(req, res);
     } else {
         updateRecord(req, res);
@@ -109,29 +124,31 @@ router.post("/", uploadFile.single('image'), (req, res) => {
 
 function insertRecord(req, res) {
     if (!isAdmin(req, res)) res.redirect('/users/signin');
-    var product = new Product();
-    product.name = req.body.name;
-    product.price = req.body.price;
-    product.stock = req.body.stock;
     const file = req.file;
-    product.picture = req.file;
     if (!file) {
         res.render('addOrEditproduct', {
             viewTitle: 'Add Product',
             loginCSS: "/stylesheets/loginform.css",
             product: req.body,
-            notification: `Error occurred during data insertion (Picture cannot upload)`,
+            notification: `Error occurred during data insertion (Picture is required for this product!)`,
         });
         return;
     }
+    var product = new Product();
+    product.name = req.body.name;
+    product.price = req.body.price;
+    product.stock = req.body.stock
+    let pic = fs.readFileSync(req.file.path);
+    let encode_pic = pic.toString('base64');
+    var picDB = {
+        cType: req.file.minitype,
+        pic: new Buffer.from(encode_pic, 'base64'),
+    }
+    product.picture = picDB;
     product.save((err, data) => {
         if (!err) {
             res.redirect("/manage");
         } else {
-
-            if (req.file && product.picture.path) fs.unlink(product.picture.path.toString(), (err) => {
-                if (err) console.log(err);
-            })
             res.render('addOrEditproduct', {
                 viewTitle: 'Add Product',
                 loginCSS: "/stylesheets/loginform.css",
@@ -142,23 +159,45 @@ function insertRecord(req, res) {
         }
     });
 }
-async function updateRecord(req, res) {
-    oldpic = await Product.findOne({ _id: req.body._id });
+function updateRecord(req, res) {
     if (!isAdmin(req, res)) res.redirect('/users/signin'); //req.body, { new: true }
-    Product.findByIdAndUpdate({ _id: req.body._id }, { name: req.body.name, price: req.body.price, stock: req.body.stock, picture: req.file }, (err, doc) => {
-        if (!err) {
-            fs.unlink(oldpic.picture.path.toString(), (err) => {
-                if (err) console.log(err);
-            })
-            res.redirect('/manage');
-        } else {
-            res.render('addOrEditproduct', {
-                viewTitle: 'Update Product',
-                product: req.body,
-                notification: `Error occurred during data insertion ${err}`,
-            });
+    if (req.file) {
+        let pic = fs.readFileSync(req.file.path);
+        let encode_pic = pic.toString('base64');
+        let picDB = {
+            cType: req.file.minitype,
+            pic: new Buffer.from(encode_pic, 'base64'),
         }
-    });
+        product.picture = picDB;
+        Product.findByIdAndUpdate({ _id: req.body._id }, { name: req.body.name, price: req.body.price, stock: req.body.stock, picture: picDB }, (err, doc) => {
+            if (!err) {
+                res.redirect('/manage');
+            } else {
+                res.render('addOrEditproduct', {
+                    viewTitle: 'Update Product',
+                    loginCSS: "/stylesheets/loginform.css",
+                    product: req.body,
+                    notification: `Error occurred during data update ${err}`,
+                });
+            }
+        });
+    }
+    else {
+        Product.findByIdAndUpdate({ _id: req.body._id }, { name: req.body.name, price: req.body.price, stock: req.body.stock}, (err, doc) => {
+            if (!err) {
+                res.redirect('/manage');
+            } else {
+                res.render('addOrEditproduct', {
+                    viewTitle: 'Update Product',
+                    product: req.body,
+                    loginCSS: "/stylesheets/loginform.css",
+                    notification: `Error occurred during data update ${err}`,
+                });
+            }
+        });
+    }
+    
+    
 }
 
 module.exports = router;
