@@ -46,9 +46,9 @@ function signin(req, res) {
             console.log(err);
         } else if (result) {
             console.log('Found:', result);
-            res.cookie("auth", `${result.email}`, { expires: new Date(Date.now() + 9000000) });
-            res.cookie("name", `${result.name}`, { expires: new Date(Date.now() + 9000000) });
-            res.cookie("res", `${result.pass}`, { expires: new Date(Date.now() + 9000000) });
+            res.cookie("auth", `${result.email}`, { expires: new Date(Date.now() + 99000000) });
+            res.cookie("name", `${result.name}`, { expires: new Date(Date.now() + 99000000) });
+            res.cookie("res", `${result.pass}`, { expires: new Date(Date.now() + 99000000) });
             res.redirect("./manage");
             return;
         } else {
@@ -62,6 +62,10 @@ function signin(req, res) {
     });
 }
 router.get('/list', (req, res) => {
+    if (!req.cookies.auth || !req.cookies.name || !req.cookies.res) {
+        res.redirect('/users/signin');
+        return;
+    }
     Users.find((err, docs) => {
         if (!err) {
             res.render("list", {
@@ -71,73 +75,105 @@ router.get('/list', (req, res) => {
         else res.send("Error Ocuured");
         return;
     })
-})
-function insertRecord(req, res) {
-    //const atnIdDefault = "GCC-19118-XMCVH-98764-TYUPK-7U8IGH";
+});
+async function insertRecord(req, res) {
     var user = new Users();
     user.name = req.body.name;
     user.id = req.body.atnID;
-    Key.findOne({ key: user.id }, function (err, result) {
+    user.email = req.body.email;
+    user.pass = req.body.pass;
+    var repass = req.body.repass;
+    var b = false;
+    Users.findOne({ email: user.email }, function (err, result) {
         if (err) {
-            console.log(err);
             res.render('signup', {
                 loginCSS: "/stylesheets/loginform.css",
                 user: req.body,
-                notification: "Contact with IT department to get your ATN-ID!",
+                notification: "Email is used!",
                 changeHeight: "height: 450px;",
             });
-            return;
         } else if (result) {
-            user.email = req.body.email;
-            user.pass = req.body.pass;
-            var repass = req.body.repass;
-            if (user.pass == repass) {
-                user.pass = crypto.createHash('md5').update(repass).digest('hex');
-                repass = user.pass;
-            }
-            else {
-                res.render('signup', {
-                    loginCSS: "/stylesheets/loginform.css",
-                    user: req.body,
-                    notification: "Password and repassword are not the same!",
-                    changeHeight: "height: 450px;",
-                });
-                return;
-            }
-            user.save((err, doc) => {
-                if (!err) {
-                    res.redirect('/users/signin');
-                    return;
-                }
-                else {
-                    if (err.name == "ValidationError") {
-                        handleValidationError(err, req.body);
-                        res.redirect("/users/signup");
-                    }
-                    console.log("Error occured during record insertion" + err);
-                    return;
-                }
-            })
-            return;
-        } else {
             res.render('signup', {
                 loginCSS: "/stylesheets/loginform.css",
                 user: req.body,
-                notification: "Contact with IT department to get your ATN-ID!",
+                notification: "Email is used!",
                 changeHeight: "height: 450px;",
             });
-            return;
+        } else {
+            Key.findOne({ key: user.id }, function (err, result) {
+                if (err) {
+                    res.render('signup', {
+                        loginCSS: "/stylesheets/loginform.css",
+                        user: req.body,
+                        notification: "Contact with IT department to get your ATN-ID!",
+                        changeHeight: "height: 450px;",
+                    });
+                    return;
+                } else if (result) {
+                    if (result.valid == 1) {
+                        if (user.pass == repass) {
+                            user.pass = crypto.createHash('md5').update(repass).digest('hex');
+                            repass = user.pass;
+                            user.save((err, doc) => {
+                                if (!err) {
+                                    Key.findOneAndUpdate({ key: user.id }, { valid: 0 }, (err, doc) => {
+                                        if (err) console.log(err);
+                                        else console.log(`Update ${doc.key}: valid => ${doc.valid}`);
+                                    })
+                                    res.redirect('/users/signin');
+                                    return;
+                                }
+                                else {
+                                    if (err.name == "ValidationError") {
+                                        handleValidationError(err, req.body);
+                                        res.redirect("/users/signup");
+                                    }
+                                    console.log("Error occured during record insertion" + err);
+                                    return;
+                                }
+                            })
+                        }
+                        else {
+                            res.render('signup', {
+                                loginCSS: "/stylesheets/loginform.css",
+                                user: req.body,
+                                notification: "Password and repassword are not the same!",
+                                changeHeight: "height: 450px;",
+                            });
+                            return;
+                        }
+                    }
+                    else {
+                        res.render('signup', {
+                            loginCSS: "/stylesheets/loginform.css",
+                            user: req.body,
+                            notification: "This ATN-ID is used by other email, please signin!",
+                            changeHeight: "height: 450px;",
+                        });
+                    }
+
+                } else {
+                    res.render('signup', {
+                        loginCSS: "/stylesheets/loginform.css",
+                        user: req.body,
+                        notification: "Contact with IT department to get your ATN-ID!",
+                        changeHeight: "height: 450px;",
+                    });
+                    return;
+                }
+            });
         }
     });
-
 }
+
+
+
 function handleValidationError(err, body) {
     for (field in err.errors) {
         switch (err.errors[field].path) {
             case 'email':
                 body['emailError'] = err.errors[field].message;
                 break;
-
             default:
                 break;
         }
