@@ -3,12 +3,10 @@
     "",
     "\\models",
     "\\public",
-    "\\public\\img",
     "\\public\\js",
     "\\public\\stylesheets",
     "\\routes",
     "\\views"
   ],
-  "SelectedNode": "\\views\\main.hbs",
   "PreviewInSolutionExplorer": false
 }

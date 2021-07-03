@@ -43,6 +43,7 @@ router.get('/', (req, res) => {
     if (!isAdmin(req, res)) res.redirect('/users/signin');
     if (req.query.qr) {
         let nameq = req.query.qr;
+        nameq = nameq.replace(/[-[\]{}()*+.,\\^$|#\s]/g,"\\$&");
         Product.find({ name: new RegExp(nameq) }, (err, docs) => {
             if (!err) {
                 if (docs.length==0) result = "No Result to Show! search blank to show all product";
