@@ -57,6 +57,12 @@ app.get('/', (req, res) => {
 
 app.use('/users', users);
 app.use('/manage', manage);
+app.use(function (req, res) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    res.redirect("/");
+    return;
+});
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {
