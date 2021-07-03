@@ -38,12 +38,11 @@
             <tbody>
                 {{#each list}}
                 <tr>
-                    <td>{{this.name}}</td>
-                    <td class="text-right">${{this.price}}</td>
-                    <td class="text-right">{{this.stock}}</td>
+                    <td style="width: 30%;">{{this.name}}</td>
+                    <td class="text-right" style="width: 40px;">${{this.price}}</td>
+                    <td class="text-right" style="width: 60px;">{{this.stock}}</td>
                     <td class="text-center">
-                       <!-- <img src="/img/{{this.picture.filename}}" alt="{{this.name}}" style="width: 150px; height: auto;" />-->
-                        <img src="data:{{this.picture.cType}};base64,{{this.picture.pic}}" alt="" style="width: 150px; height:auto;"/>
+                        <img src="data:{{this.picture.cType}};base64,{{this.picture.pic}}" alt="" style="width: 220px; height:auto;"/>
                     </td>
                     <td class="text-center">
                         <a href="/manage/update/{{this._id}}">
